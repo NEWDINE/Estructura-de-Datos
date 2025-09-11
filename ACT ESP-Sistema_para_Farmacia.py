@@ -1,5 +1,4 @@
 # Sistema de Farmacia Delta Corps - POO
-# Programador: tu rol
 
 class Medicamento:
     def __init__(self, nombre, precio, stock):
@@ -184,4 +183,5 @@ def main():
             print("Opción inválida.")
 
 if __name__ == "__main__":
+
     main()
