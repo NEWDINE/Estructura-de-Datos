@@ -1,0 +1,6 @@
+CONCLUSIONES:
+
+El experimento muestra que el programa funciona de manera eficiente con datos pequeños y medianos. 
+Sin embargo, cuando la matriz alcanza tamaños masivos, aparecen limitaciones de hardware (RAM y procesador), que impiden seguir ejecutando el código.
+En la vida real siempre debemos ajustar el tamaño de los datos a las capacidades del sistema y, 
+en proyectos grandes, recurrir a técnicas avanzadas.
