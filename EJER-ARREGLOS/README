@@ -1,0 +1,30 @@
+# Programa de Ventas Mensuales por Departamento
+
+Se implementa un arreglo bidimensional para registrar las ventas mensuales de tres departamentos a lo largo de los 12 meses del año.  
+
+## Funcionamiento del programa
+
+El programa despliega un menú en la terminal con las siguientes opciones:
+
+- Insertar venta
+   Permite registrar una venta en un mes y departamento específicos.  
+   El usuario elige:
+   - El número de mes (1–12).  
+   - El departamento (1=Ropa, 2=Deportes, 3=Juguetería).  
+   - El valor de la venta.  
+
+   Ese valor se guarda en la celda correspondiente del arreglo.
+
+- Buscar venta
+   Permite consultar una venta en particular.  
+   El usuario ingresa el mes y el departamento, y el programa muestra la venta almacenada en esa posición.
+
+- Eliminar venta
+   Permite borrar una venta en un mes y departamento específicos.  
+   La celda correspondiente se reemplaza por 0.
+
+- Mostrar tabla completa
+   Muestra toda la tabla de ventas con los meses como filas y los departamentos como columnas.
+
+- Salir
+   Finaliza el programa.
