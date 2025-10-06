@@ -63,10 +63,8 @@ def construir_arbol(expr: str) -> Nodo:
             ops.pop()
             prev = 'num'
         else:
-            # manejar '-' unario
             if t == '-' and (prev in (None, 'op', '(')):
                 t = 'neg'
-            # manejar √ como unario
             if t == '√':
                 ops.append(t)
                 prev = 'op'
