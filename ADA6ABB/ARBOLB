@@ -1,0 +1,323 @@
+import tkinter as tk
+from collections import deque
+
+class Nodo:
+    def __init__(self, dato):
+        self.dato = dato
+        self.izq = None
+        self.der = None
+
+class ArbolBinarioBusqueda:
+    def __init__(self):
+        self.raiz = None
+
+    def esVacio(self):
+        return self.raiz is None
+
+    def insertar(self, dato):
+        def _insertar(nodo, dato):
+            if nodo is None:
+                return Nodo(dato)
+            if dato < nodo.dato:
+                nodo.izq = _insertar(nodo.izq, dato)
+            elif dato > nodo.dato:
+                nodo.der = _insertar(nodo.der, dato)
+            return nodo
+        self.raiz = _insertar(self.raiz, dato)
+
+    def mostrar(self):
+        if self.raiz is None:
+            print("Árbol vacío.")
+            return
+        posiciones = {}
+        self._calcular_posiciones(self.raiz, 0, 0, posiciones)
+        min_x = min(pos[0] for pos in posiciones.values())
+        max_x = max(pos[0] for pos in posiciones.values())
+        min_y = 0
+        max_y = max(pos[1] for pos in posiciones.values())
+        ancho = (max_x - min_x + 1) * 3
+        alto = (max_y - min_y + 1) * 2
+        canvas = [[" " for _ in range(ancho)] for _ in range(alto)]
+        for nodo, (x, y) in posiciones.items():
+            gx = (x - min_x) * 3
+            gy = y * 2
+            valor = str(nodo)
+            for i, c in enumerate(valor):
+                if gx + i < ancho:
+                    canvas[gy][gx + i] = c
+        for nodo, (x, y) in posiciones.items():
+            gx = (x - min_x) * 3
+            gy = y * 2
+            for otro, (cx, cy) in posiciones.items():
+                if cy == y + 1:
+                    if self._es_hijo(self.raiz, nodo, otro):
+                        cxg = (cx - min_x) * 3
+                        if cxg < gx:
+                            canvas[gy + 1][gx - 1] = "/"
+                        elif cxg > gx:
+                            canvas[gy + 1][gx + 1] = "\\"
+        for fila in canvas:
+            print("".join(fila))
+
+    def _calcular_posiciones(self, nodo, x, y, posiciones):
+        if nodo is None:
+            return
+        posiciones[nodo.dato] = (x, y)
+        if nodo.izq:
+            self._calcular_posiciones(nodo.izq, x - 1, y + 1, posiciones)
+        if nodo.der:
+            self._calcular_posiciones(nodo.der, x + 1, y + 1, posiciones)
+
+    def _es_hijo(self, raiz, padre_dato, hijo_dato):
+        def buscar(nodo):
+            if nodo is None:
+                return False
+            if nodo.dato == padre_dato:
+                if (nodo.izq and nodo.izq.dato == hijo_dato) or \
+                   (nodo.der and nodo.der.dato == hijo_dato):
+                    return True
+            return buscar(nodo.izq) or buscar(nodo.der)
+        return buscar(raiz)
+
+    def graficar(self):
+        if self.raiz is None:
+            print("Árbol vacío, no se puede graficar.")
+            return
+        ventana = tk.Tk()
+        ventana.title("Árbol Binario de Búsqueda (Vertical)")
+        canvas = tk.Canvas(ventana, width=1000, height=700, bg="white")
+        canvas.pack()
+        radio = 20
+        dx = 60
+        dy = 80
+        def ancho_subarbol(nodo):
+            if nodo is None:
+                return 0
+            if nodo.izq is None and nodo.der is None:
+                return 1
+            return ancho_subarbol(nodo.izq) + ancho_subarbol(nodo.der)
+        def _dibujar(nodo, x, y, escala):
+            if nodo is None:
+                return
+            if nodo.izq:
+                nx = x - dx * escala
+                ny = y + dy
+                canvas.create_line(x, y + radio, nx, ny - radio, width=2, fill="gray")
+                _dibujar(nodo.izq, nx, ny, escala / 1.3)
+            if nodo.der:
+                nx = x + dx * escala
+                ny = y + dy
+                canvas.create_line(x, y + radio, nx, ny - radio, width=2, fill="gray")
+                _dibujar(nodo.der, nx, ny, escala / 1.3)
+            canvas.create_oval(x - radio, y - radio, x + radio, y + radio,
+                               fill="#90CAF9", outline="black", width=2)
+            canvas.create_text(x, y, text=str(nodo.dato), font=("Arial", 12, "bold"))
+        _dibujar(self.raiz, 500, 60, 4)
+        ventana.mainloop()
+
+    def buscar(self, dato):
+        def _buscar(nodo, dato):
+            if nodo is None:
+                return False
+            if dato == nodo.dato:
+                return True
+            elif dato < nodo.dato:
+                return _buscar(nodo.izq, dato)
+            else:
+                return _buscar(nodo.der, dato)
+        return _buscar(self.raiz, dato)
+
+    def preOrden(self, nodo):
+        if nodo:
+            print(nodo.dato, end=" ")
+            self.preOrden(nodo.izq)
+            self.preOrden(nodo.der)
+
+    def inOrden(self, nodo):
+        if nodo:
+            self.inOrden(nodo.izq)
+            print(nodo.dato, end=" ")
+            self.inOrden(nodo.der)
+
+    def postOrden(self, nodo):
+        if nodo:
+            self.postOrden(nodo.izq)
+            self.postOrden(nodo.der)
+            print(nodo.dato, end=" ")
+
+    def eliminar_predecesor(self, dato):
+        def _maximo(nodo):
+            while nodo.der:
+                nodo = nodo.der
+            return nodo
+        def _eliminar(nodo, dato):
+            if nodo is None:
+                return nodo
+            if dato < nodo.dato:
+                nodo.izq = _eliminar(nodo.izq, dato)
+            elif dato > nodo.dato:
+                nodo.der = _eliminar(nodo.der, dato)
+            else:
+                if nodo.izq and nodo.der:
+                    predecesor = _maximo(nodo.izq)
+                    nodo.dato = predecesor.dato
+                    nodo.izq = _eliminar(nodo.izq, predecesor.dato)
+                else:
+                    nodo = nodo.izq if nodo.izq else nodo.der
+            return nodo
+        self.raiz = _eliminar(self.raiz, dato)
+
+    def eliminar_sucesor(self, dato):
+        def _minimo(nodo):
+            while nodo.izq:
+                nodo = nodo.izq
+            return nodo
+        def _eliminar(nodo, dato):
+            if nodo is None:
+                return nodo
+            if dato < nodo.dato:
+                nodo.izq = _eliminar(nodo.izq, dato)
+            elif dato > nodo.dato:
+                nodo.der = _eliminar(nodo.der, dato)
+            else:
+                if nodo.izq and nodo.der:
+                    sucesor = _minimo(nodo.der)
+                    nodo.dato = sucesor.dato
+                    nodo.der = _eliminar(nodo.der, sucesor.dato)
+                else:
+                    nodo = nodo.izq if nodo.izq else nodo.der
+            return nodo
+        self.raiz = _eliminar(self.raiz, dato)
+
+    def porNiveles(self):
+        if self.raiz is None:
+            print("Árbol vacío.")
+            return
+        cola = deque([self.raiz])
+        while cola:
+            nodo = cola.popleft()
+            print(nodo.dato, end=" ")
+            if nodo.izq:
+                cola.append(nodo.izq)
+            if nodo.der:
+                cola.append(nodo.der)
+
+    def altura(self, nodo):
+        if nodo is None:
+            return 0
+        return 1 + max(self.altura(nodo.izq), self.altura(nodo.der))
+
+    def contarHojas(self, nodo):
+        if nodo is None:
+            return 0
+        if nodo.izq is None and nodo.der is None:
+            return 1
+        return self.contarHojas(nodo.izq) + self.contarHojas(nodo.der)
+
+    def contarNodos(self, nodo):
+        if nodo is None:
+            return 0
+        return 1 + self.contarNodos(nodo.izq) + self.contarNodos(nodo.der)
+
+    def esCompleto(self):
+        if not self.raiz:
+            return True
+        cola = deque([self.raiz])
+        vacio = False
+        while cola:
+            nodo = cola.popleft()
+            if nodo:
+                if vacio:
+                    return False
+                cola.append(nodo.izq)
+                cola.append(nodo.der)
+            else:
+                vacio = True
+        return True
+
+    def esLleno(self, nodo):
+        if nodo is None:
+            return True
+        if nodo.izq is None and nodo.der is None:
+            return True
+        if nodo.izq and nodo.der:
+            return self.esLleno(nodo.izq) and self.esLleno(nodo.der)
+        return False
+
+    def eliminarArbol(self):
+        self.raiz = None
+        print("Árbol eliminado correctamente.")
+
+def menu():
+    arbol = ArbolBinarioBusqueda()
+    while True:
+        print("\n=== MENÚ ÁRBOL BINARIO DE BÚSQUEDA ===")
+        print("[1] Insertar elemento")
+        print("[2] Mostrar árbol (texto)")
+        print("[3] Graficar árbol vertical (Tkinter)")
+        print("[4] Buscar elemento")
+        print("[5] Recorrer PreOrden")
+        print("[6] Recorrer InOrden")
+        print("[7] Recorrer PostOrden")
+        print("[8] Eliminar nodo (Predecesor)")
+        print("[9] Eliminar nodo (Sucesor)")
+        print("[10] Recorrer por niveles")
+        print("[11] Altura del árbol")
+        print("[12] Cantidad de hojas")
+        print("[13] Cantidad de nodos")
+        print("[15] ¿Es árbol completo?")
+        print("[16] ¿Es árbol lleno?")
+        print("[17] Eliminar árbol completo")
+        print("[0] Salir")
+        op = input("\nSeleccione una opción: ")
+        try:
+            if op == "1":
+                dato = int(input("Ingrese el valor a insertar: "))
+                arbol.insertar(dato)
+            elif op == "2":
+                arbol.mostrar()
+            elif op == "3":
+                arbol.graficar()
+            elif op == "4":
+                dato = int(input("Ingrese el valor a buscar: "))
+                print("Resultado:", "Encontrado" if arbol.buscar(dato) else "No encontrado")
+            elif op == "5":
+                print("PreOrden:", end=" ")
+                arbol.preOrden(arbol.raiz); print()
+            elif op == "6":
+                print("InOrden:", end=" ")
+                arbol.inOrden(arbol.raiz); print()
+            elif op == "7":
+                print("PostOrden:", end=" ")
+                arbol.postOrden(arbol.raiz); print()
+            elif op == "8":
+                dato = int(input("Ingrese el valor a eliminar (predecesor): "))
+                arbol.eliminar_predecesor(dato)
+            elif op == "9":
+                dato = int(input("Ingrese el valor a eliminar (sucesor): "))
+                arbol.eliminar_sucesor(dato)
+            elif op == "10":
+                print("Por niveles:", end=" ")
+                arbol.porNiveles(); print()
+            elif op == "11":
+                print("Altura:", arbol.altura(arbol.raiz))
+            elif op == "12":
+                print("Hojas:", arbol.contarHojas(arbol.raiz))
+            elif op == "13":
+                print("Nodos:", arbol.contarNodos(arbol.raiz))
+            elif op == "15":
+                print("¿Completo?:", arbol.esCompleto())
+            elif op == "16":
+                print("¿Lleno?:", arbol.esLleno(arbol.raiz))
+            elif op == "17":
+                arbol.eliminarArbol()
+            elif op == "0":
+                print("Saliendo del programa...")
+                break
+            else:
+                print("Opción no válida.")
+        except ValueError:
+            print("Error: debe ingresar un número entero.")
+
+if __name__ == "__main__":
+    menu()
