@@ -1,0 +1,33 @@
+Estados:
+- Yucatán
+- Campeche
+- Quintana Roo
+- Tabasco
+- Chiapas
+- Oaxaca
+- Veracruz
+
+Relaciones (aristas):
+- Yucatán <-> Campeche : 300 km
+- Yucatán <-> Quintana Roo : 400 km
+- Campeche <-> Tabasco : 350 km
+- Tabasco <-> Chiapas : 250 km
+- Chiapas <-> Oaxaca : 300 km
+- Oaxaca <-> Veracruz : 400 km
+- Veracruz <-> Tabasco : 500 km
+- Campeche <-> Chiapas : 700 km
+- Quintana Roo <-> Tabasco : 600 km
+- Oaxaca <-> Campeche : 650 km
+- Veracruz <-> Campeche : 800 km
+
+Hamiltonianos encontrados: 60
+
+Mejor (sin repetir):
+Quintana Roo -> Yucatán -> Campeche -> Tabasco -> Chiapas -> Oaxaca -> Veracruz
+Costo: 2000 km
+
+Caminos con repetición (longitud 8) encontrados: 600
+
+Mejor (repitiendo al menos uno):
+Yucatán -> Quintana Roo -> Yucatán -> Campeche -> Tabasco -> Chiapas -> Oaxaca -> Veracruz
+Costo: 2400 km
